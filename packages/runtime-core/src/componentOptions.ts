@@ -548,6 +548,8 @@ export let shouldCacheAccess = true
 
 export function applyOptions(instance: ComponentInternalInstance) {
   const options = resolveMergedOptions(instance)
+  options.props = instance.propsOptions[0]
+  options.emits = instance.emitsOptions
   const publicThis = instance.proxy! as any
   const ctx = instance.ctx
 
@@ -979,39 +981,39 @@ export function mergeOptions(
   asMixin = false
 ) {
   if (__COMPAT__ && isFunction(from)) {
-    from = from.options
+    from = from.options;
   }
 
-  const { mixins, extends: extendsOptions } = from
+  const { mixins, extends: extendsOptions } = from;
 
   if (extendsOptions) {
-    mergeOptions(to, extendsOptions, strats, true)
+    mergeOptions(to, extendsOptions, strats, true);
   }
   if (mixins) {
     mixins.forEach((m: ComponentOptionsMixin) =>
       mergeOptions(to, m, strats, true)
-    )
+    );
   }
 
   for (const key in from) {
-    if (asMixin && key === 'expose') {
+    if (asMixin && key === "expose") {
       __DEV__ &&
         warn(
           `"expose" option is ignored when declared in mixins or extends. ` +
             `It should only be declared in the base component itself.`
-        )
+        );
+    } else if (key === "props" || key === "emits") {
+      continue;
     } else {
-      const strat = internalOptionMergeStrats[key] || (strats && strats[key])
-      to[key] = strat ? strat(to[key], from[key]) : from[key]
+      const strat = internalOptionMergeStrats[key] || (strats && strats[key]);
+      to[key] = strat ? strat(to[key], from[key]) : from[key];
     }
   }
-  return to
+  return to;
 }
 
 export const internalOptionMergeStrats: Record<string, Function> = {
   data: mergeDataFn,
-  props: mergeObjectOptions, // TODO
-  emits: mergeObjectOptions, // TODO
   // objects
   methods: mergeObjectOptions,
   computed: mergeObjectOptions,
