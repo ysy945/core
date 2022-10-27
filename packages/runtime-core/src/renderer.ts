@@ -2047,6 +2047,12 @@ function baseCreateRenderer(
         }
       }
     } else {
+      //#6934 if you use Both of KeepAlive and CustemElement,
+      //CustemElement will not recreate,change property of 
+      //"_resolved" to make sure update.
+      if(el._resolved === true){
+        el._resolved = false
+      }
       hostInsert(el!, container, anchor)
     }
   }
